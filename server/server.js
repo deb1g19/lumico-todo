@@ -16,9 +16,10 @@ app.use(bodyParser.json());
 
 // Server port
 var HTTP_PORT = 8000
+var ADDRESS = '0.0.0.0'
 
 // Initialise server, listening on HTTP_PORT
-app.listen(HTTP_PORT, () => {
+app.listen(HTTP_PORT, ADDRESS, () => {
     console.log("Server running on port %PORT%".replace("%PORT%", HTTP_PORT))
 });
 

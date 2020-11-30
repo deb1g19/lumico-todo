@@ -4,11 +4,19 @@
 // Using express as it's the standard server framework for node.js
 var express = require("express")
 var app = express()
+
 // Import file to handle the local sqlite database
 var db = require("./database.js")
 
+// bodyParses parses POST requests and stores them in req.body within an endpoint
+var bodyParser = require("body-parser");
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 // Server port
 var HTTP_PORT = 8000
+
 // Initialise server, listening on HTTP_PORT
 app.listen(HTTP_PORT, () => {
     console.log("Server running on port %PORT%".replace("%PORT%", HTTP_PORT))
@@ -21,14 +29,15 @@ app.get("/", (req, res, next) => {
 
 // Endpoint to get all tasks
 app.get("/api/tasks", (req, res, next) => {
-    var sql = "select * from tasks"
+    var query = "SELECT * FROM tasks"
     var params = []
-    db.all(sql, params, (err, rows) => {
+    db.all(query, params, (err, rows) => {
         if (err) {
-            // Throw a 'bad request' error since something went wrong retreiving data
+            // Throw a bad request error since something went wrong retreiving data
             res.status(400).json({ "error": err.message });
             return;
         }
+        // Return all of the tasks (rows) in json format
         res.json({
             "message": "success",
             "data": rows
@@ -36,24 +45,73 @@ app.get("/api/tasks", (req, res, next) => {
     });
 });
 
-// Endpoint to get al single task by id
-app.get("/api/user/:id", (req, res, next) => {
-    var sql = "select * from user where id = ?"
+// Endpoint to get a single task by id, specified with ':id'
+app.get("/api/task/:id", (req, res, next) => {
+    var query = "SELECT * FROM tasks WHERE id = ?"
     var params = [req.params.id]
-    db.get(sql, params, (err, row) => {
+    db.get(query, params, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message });
             return;
         }
+        // Return the task (row) in json format
         res.json({
             "message": "success",
             "data": row
         })
     });
 });
-// TODO: Insert endpoints here
 
-// Throw a '404 not found' error for any other requests
+// Endpoint to create a new task
+app.post("/api/task/", (req, res, next) => {
+    var errors = []
+    // Check if the body, created by 'body-parser', contains a task
+    if (!req.body.task) {
+        errors.push("No task specified");
+    }
+    // Throw a bad request error if an error (likely the above) is encountered
+    if (errors.length) {
+        res.status(400).json({ "error": errors.join(",") });
+        return;
+    }
+    // Parse the task into a data object
+    var data = {
+        task: req.body.task,
+    }
+    var query = 'INSERT INTO tasks (task) VALUES (?)'
+    var params = [data.task]
+
+    //ES6 arrow notation isn't used below as we need to use 'this' when returning lastID
+    db.run(query, params, function (err, result) {
+        if (err) {
+            res.status(400).json({ "error": err.message })
+            return;
+        }
+        // Return the id of the created task as confirmation in json format
+        res.json({
+            "message": "success",
+            "data": data,
+            "id": this.lastID
+        })
+    });
+})
+
+// Create endpoint to delete a task
+app.delete("/api/task/:id", (req, res, next) => {
+    db.run(
+        'DELETE FROM tasks WHERE id = ?',
+        // Get the id of the task to delete from the request parameters
+        req.params.id,
+        function (err, _) {
+            if (err) {
+                res.status(400).json({ "error": res.message })
+                return;
+            }
+            res.json({ "message": "deleted", changes: this.changes })
+        });
+})
+
+// Throw a not found error for any other requests
 app.use(function (req, res) {
     res.status(404);
 });

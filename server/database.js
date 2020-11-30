@@ -1,26 +1,25 @@
 var sqlite3 = require('sqlite3').verbose()
-var md5 = require('md5')
 
+// The name of the local database file
 const DBSOURCE = "db.sqlite"
 
 let db = new sqlite3.Database(DBSOURCE, (err) => {
     if (err) {
-        // Cannot open database
+        // This error is thrown if the database cannot be opened
         console.error(err.message)
         throw err
     } else {
-        console.log('Connected to the SQLite database.')
+        console.log('Connected to the database successfully')
+        // There's a single table, with an id column and a task (text) column for tasks
         db.run(`CREATE TABLE tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             task text
             )`,
             (err) => {
-                if (err) {
-                    // The tasks table already exists. We don't need to do anything
-                }
+                // The table has already been created. We don't need to do anything here but must handle the error
             });
     }
 });
 
-
+// Create a binding to the above function for use in other files
 module.exports = db

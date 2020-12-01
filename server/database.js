@@ -13,7 +13,8 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
         // There's a single table, with an id column and a task (text) column for tasks
         db.run(`CREATE TABLE tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            task text
+            task TEXT,
+            completed INTEGER
             )`,
             (err) => {
                 // The table has already been created. We don't need to do anything here but must handle the error

@@ -1,61 +1,102 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:todo/constants.dart';
-import 'dart:convert';
+import 'package:todo/widgets/task_tile.dart';
 import '../models/task.dart';
+import 'dart:math';
 
 class TaskList extends StatefulWidget {
-  TaskList({Key key}) : super(key: key);
+  final Future<List<Task>> futureTasks;
+  TaskList(this.futureTasks);
 
   @override
   _TaskListState createState() => _TaskListState();
 }
 
 class _TaskListState extends State<TaskList> {
-  Future<List<Task>> futureTasks;
-  @override
-  void initState() {
-    super.initState();
-    // Fetch tasks in initState so that it is run exactly once. This prevents unneccessary API calls.
-    futureTasks = fetchTasks();
-  }
-
-  Future<List<Task>> fetchTasks() async {
-    final response = await http.get("$kAPI_URL /api/tasks/");
-    // If we get a 200 response from the server, nothing went wrong
-    if (response.statusCode == 200) {
-      // Map the json to Task objects
-      var tasks = List.from(jsonDecode(response.body)["data"])
-          .map((e) => Task.fromJson(e))
-          .toList();
-      return tasks;
-    } else {
-      throw Exception("Failed to get tasks");
-    }
-  }
+  final GlobalKey<AnimatedListState> listKey = GlobalKey();
+  final random = new Random();
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: FutureBuilder<List<Task>>(
-        future: futureTasks,
+        future: widget.futureTasks,
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            // If the API call was successful and we have data, build an animated list from the data
-            // snapshot.data is a list of Task objects
-            return AnimatedList(
-                initialItemCount: snapshot.data.length,
-                itemBuilder: (context, index, animation) {
-                  return SlideInLeft(child: Text(snapshot.data[index].task));
-                });
-          } else if (snapshot.hasError) {
-            return Text("${snapshot.error}");
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData) {
+              // If the API call was successful and we have data, build an animated list from the data
+              // snapshot.data is a list of Task objects
+              return snapshot.data.length == 0
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image(
+                          image: AssetImage("images/empty.png"),
+                        ),
+                        Text(
+                          "It's quiet in here,\nadd some tasks!",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText1
+                              .copyWith(fontWeight: FontWeight.w300),
+                          textAlign: TextAlign.center,
+                        )
+                      ],
+                    )
+                  : buildListView(snapshot.data);
+            } else if (snapshot.hasError) {
+              return Text("${snapshot.error}");
+            }
           }
+
           // If there's not any data retreived yet, show a progress indicator
-          return CircularProgressIndicator();
+          return buildProgressIndicator();
         },
       ),
     );
+  }
+
+  Widget buildProgressIndicator() {
+    return Center(
+        child: SizedBox(
+            height: 25, width: 25, child: CircularProgressIndicator()));
+  }
+
+  Widget buildListView(List<Task> tasks) {
+    return ListView.builder(
+        key: listKey,
+        itemCount: tasks.length,
+        itemBuilder: (context, index) {
+          return buildTask(tasks[index], index);
+        });
+  }
+
+  Widget buildTask(Task task, int index) {
+    return Dismissible(
+      key: UniqueKey(),
+      child: buildListTile(task, index),
+      background: Container(
+        color: Colors.red[300],
+      ),
+      onDismissed: (direction) {
+        removeItem(task);
+      },
+    );
+  }
+
+  Future<http.Response> removeItem(Task task) async {
+    final http.Response response = await http.delete(
+      "$kAPI_URL/api/task/${task.id}",
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    return response;
+  }
+
+  Widget buildListTile(Task task, int index) {
+    return TaskTile(task);
   }
 }

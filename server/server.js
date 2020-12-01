@@ -63,6 +63,50 @@ app.get("/api/task/:id", (req, res, next) => {
     });
 });
 
+// Endpoint to mark a task as completed
+app.post("/api/task/:id/complete", (req, res, next) => {
+    var query = 'UPDATE tasks SET completed=1 WHERE id = ?'
+    var params = [req.params.id]
+    var data = {
+        id: req.params.id,
+        completed: 1
+    }
+    //ES6 arrow notation isn't used below as we need to use 'this' when returning lastID
+    db.run(query, params, function (err, result) {
+        if (err) {
+            res.status(400).json({ "error": err.message })
+            return;
+        }
+        // Return the id of the created task as confirmation in json format
+        res.json({
+            "message": "success",
+            "data": data
+        })
+    });
+})
+
+// Endpoint to mark a task as uncompleted
+app.post("/api/task/:id/incomplete", (req, res, next) => {
+    var query = 'UPDATE tasks SET completed=0 WHERE id = ?'
+    var params = [req.params.id]
+    var data = {
+        id: req.params.id,
+        completed: 0
+    }
+    //ES6 arrow notation isn't used below as we need to use 'this' when returning lastID
+    db.run(query, params, function (err, result) {
+        if (err) {
+            res.status(400).json({ "error": err.message })
+            return;
+        }
+        // Return the id of the created task as confirmation in json format
+        res.json({
+            "message": "success",
+            "data": data
+        })
+    });
+})
+
 // Endpoint to create a new task
 app.post("/api/task/", (req, res, next) => {
     var errors = []
@@ -78,9 +122,10 @@ app.post("/api/task/", (req, res, next) => {
     // Parse the task into a data object
     var data = {
         task: req.body.task,
+        completed: 0
     }
-    var query = 'INSERT INTO tasks (task) VALUES (?)'
-    var params = [data.task]
+    var query = 'INSERT INTO tasks (task, completed) VALUES (?1, ?2)'
+    var params = [data.task, data.completed]
 
     //ES6 arrow notation isn't used below as we need to use 'this' when returning lastID
     db.run(query, params, function (err, result) {

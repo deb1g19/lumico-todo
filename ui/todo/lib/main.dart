@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo/screens/home_screen.dart';
@@ -32,7 +30,7 @@ class MyApp extends StatelessWidget {
                   fontSize: 25,
                   color: Colors.black))),
       home: Scaffold(
-        backgroundColor: Color(0xFFE5E5E5),
+        backgroundColor: Color(0xFFEDEDED),
         body: HomeScreen(),
       ),
     );

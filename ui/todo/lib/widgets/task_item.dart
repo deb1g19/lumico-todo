@@ -1,56 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:todo/models/task.dart';
-import 'package:todo/constants.dart';
+import 'package:todo/models/tasks_model.dart';
 import 'package:provider/provider.dart';
-import 'package:todo/models/tasks.dart';
 
 class TaskItem extends StatefulWidget {
-  final Task task;
-  TaskItem({Key key, @required this.task}) : super(key: key);
+  final int index;
+  TaskItem(this.index);
 
   @override
   _TaskItemState createState() => _TaskItemState();
 }
 
 class _TaskItemState extends State<TaskItem> {
-  bool completed;
-  @override
-  void initState() {
-    super.initState();
-    completed = widget.task.completed;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Dismissible(
-        key: UniqueKey(),
-        onDismissed: (direction) {
-          setState(() {
-            context.read<Tasks>().deleteTask(widget.task);
-          });
+    var tasksModel = context.watch<TasksModel>();
+    bool pressed = tasksModel.getTaskAt(widget.index).completed;
+    return Dismissible(
+      key: UniqueKey(),
+      onDismissed: (direction) {
+        tasksModel.removeTaskAt(widget.index);
+      },
+      child: CheckboxListTile(
+        value: pressed,
+        onChanged: (value) {
+          tasksModel.toggleTaskAt(widget.index);
         },
-        child: Container(
-          child: CheckboxListTile(
-            controlAffinity: ListTileControlAffinity.leading,
-            title: Text(
-              widget.task.text,
-              style: completed
-                  ? Theme.of(context)
-                      .textTheme
-                      .bodyText1
-                      .copyWith(decoration: TextDecoration.lineThrough)
-                  : Theme.of(context).textTheme.bodyText1,
-            ),
-            onChanged: (value) {
-              setState(() {
-                completed = !completed;
-              });
-              context.read<Tasks>().updateTaskStatus(widget.task, completed);
-            },
-            value: completed,
-          ),
-        ),
+        title: pressed
+            ? Text(
+                tasksModel.getTaskAt(widget.index).text,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyText1
+                    .copyWith(decoration: TextDecoration.lineThrough),
+              )
+            : Text(tasksModel.getTaskAt(widget.index).text,
+                style: Theme.of(context).textTheme.bodyText1),
       ),
     );
   }

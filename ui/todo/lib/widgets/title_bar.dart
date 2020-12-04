@@ -19,7 +19,7 @@ class TitleBar extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text("Todo", style: Theme.of(context).textTheme.headline1),
+              Text("ToDo", style: Theme.of(context).textTheme.headline1),
               Text(now.format('j.m.y'),
                   style: Theme.of(context).textTheme.subtitle1),
             ],

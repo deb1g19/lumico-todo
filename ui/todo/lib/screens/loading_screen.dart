@@ -1,11 +1,12 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:todo/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:todo/models/tasks_model.dart';
-import '../constants.dart';
 import '../models/task_model.dart';
+
+// Loading screen uses a futureBuilder to get tasks from the api,
+// providing a loading indicator whilst the async method getTasksFromAPI() is runnning.
+// Once ready, the home screen is created using the tasks.
 
 class LoadingScreen extends StatefulWidget {
   LoadingScreen({Key key}) : super(key: key);
@@ -15,40 +16,38 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  bool loaded = false;
-  Future<List<TaskModel>> getTasksFromAPI() async {
-    final response = await http.get('$kAPI_URL/api/tasks/');
-    if (response.statusCode == 200) {
-      var tasks = List.from(jsonDecode(response.body)["data"])
-          .map((e) => TaskModel.fromJson(e))
-          .toList();
-      context.read<TasksModel>().initialise(tasks);
-      return tasks;
-    } else {
-      throw Exception("Failed to get tasks");
-    }
-  }
-
+  Future<List<TaskModel>> futureTasks;
   @override
   void initState() {
     super.initState();
-    getTasksFromAPI().then((_) {
-      setState(() {
-        loaded = true;
-      });
-    });
+    // This widget does not need to be rebuilt when the database data changes as
+    // once we've instantiated the TasksModel from the exisiting data, any changes
+    // can be made both locally and via the database. The benefit of this is that
+    // we don't need to show a loading indicator after creating/deleting a task.
+    futureTasks = context.read<TasksModel>().getTasksFromAPI();
   }
 
   @override
   Widget build(BuildContext context) {
-    return loaded
-        ? HomeScreen()
-        : Center(
+    return FutureBuilder(
+      future: futureTasks,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return HomeScreen();
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text("Something went wrong"),
+          );
+        } else {
+          return Center(
             child: SizedBox(
               width: 50,
               height: 50,
               child: CircularProgressIndicator(),
             ),
           );
+        }
+      },
+    );
   }
 }

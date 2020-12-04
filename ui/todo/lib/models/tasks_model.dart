@@ -66,4 +66,17 @@ class TasksModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<List<TaskModel>> getTasksFromAPI() async {
+    final response = await http.get('$kAPI_URL/api/tasks/');
+    if (response.statusCode == 200) {
+      List<TaskModel> newTasks = List.from(jsonDecode(response.body)["data"])
+          .map((e) => TaskModel.fromJson(e))
+          .toList();
+      tasks.addAll(newTasks);
+      return tasks;
+    } else {
+      throw Exception("Failed to get tasks");
+    }
+  }
 }

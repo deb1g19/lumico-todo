@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:todo/constants.dart';
 import 'package:todo/models/tasks_model.dart';
 import 'package:provider/provider.dart';
+import 'package:todo/widgets/bottom_input.dart';
+import 'package:todo/widgets/round_icon.dart';
 import 'package:todo/widgets/task_item.dart';
 import 'package:date_time_format/date_time_format.dart';
 
@@ -17,133 +20,75 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     var tasksModel = context.watch<TasksModel>();
-    return Stack(
-      children: [
-        Column(
-          children: [
-            Text("Todo", style: Theme.of(context).textTheme.headline1),
-            Text("${now.format('j.m.y')}",
-                style: Theme.of(context).textTheme.subtitle1),
-            tasksModel.tasks.length == 0
-                ? Column(
-                    children: [
-                      Image.asset("images/empty.png"),
-                      Text("It's empty in here. Add some tasks!")
-                    ],
-                  )
-                : Container(
-                    child: Flexible(
-                      child: ListView.builder(
-                        reverse: true,
-                        shrinkWrap: true,
-                        itemCount: tasksModel.tasks.length,
-                        itemBuilder: (context, index) {
-                          return TaskItem(index);
-                        },
-                      ),
-                    ),
-                  )
-          ],
+    return Container(
+      color: Theme.of(context).primaryColor,
+      child: Column(children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const RoundIcon(Icons.event_note_outlined),
+              buildTitleDate(context, now.format('j.m.y'))
+            ],
+          ),
         ),
-        BottomInput(controller: controller, tasksModel: tasksModel)
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+                color: kOffWhite,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30))),
+            // Padding to compensate for border radius
+            padding: EdgeInsets.only(top: 25),
+            child: Stack(
+              children: [
+                tasksModel.tasks.length == 0
+                    ? buildEmpty()
+                    : Container(
+                        child: ListView.builder(
+                          reverse: true,
+                          shrinkWrap: true,
+                          itemCount: tasksModel.tasks.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
+                              child: TaskItem(index),
+                            );
+                          },
+                        ),
+                      ),
+                BottomInput(controller: controller, tasksModel: tasksModel)
+              ],
+            ),
+          ),
+        )
+      ]),
+    );
+  }
+
+  Column buildTitleDate(BuildContext context, String date) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text("Todo", style: Theme.of(context).textTheme.headline1),
+        Text(date, style: Theme.of(context).textTheme.subtitle1),
       ],
     );
   }
-}
 
-class BottomInput extends StatelessWidget {
-  const BottomInput(
-      {Key key, @required this.controller, @required this.tasksModel})
-      : super(key: key);
-
-  final TextEditingController controller;
-  final TasksModel tasksModel;
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: MediaQuery.of(context).viewInsets.bottom,
-      child: Padding(
-        padding: const EdgeInsets.all(25.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: RoundedTextField(
-                  hintText: "Test task",
-                  controller: controller,
-                  onSubmitted: (_) {
-                    tasksModel.addTask(controller.text);
-                    controller.clear();
-                  }),
-            ),
-            SizedBox(
-              width: 20,
-            ),
-            RoundedIconButton(
-                onPressed: () {
-                  tasksModel.addTask(controller.text);
-                  controller.clear();
-                  FocusScope.of(context).unfocus();
-                },
-                icon: Icons.add)
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class RoundedIconButton extends StatelessWidget {
-  final Function onPressed;
-  final IconData icon;
-  const RoundedIconButton({@required this.onPressed, @required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.blue,
-        borderRadius: BorderRadius.circular(100),
-      ),
-      child: IconButton(
-        icon: Icon(
-          icon,
-          color: Colors.white,
-        ),
-        onPressed: onPressed,
-      ),
-    );
-  }
-}
-
-class RoundedTextField extends StatelessWidget {
-  final String hintText;
-  final TextEditingController controller;
-  final Function onSubmitted;
-  const RoundedTextField(
-      {@required this.hintText,
-      @required this.controller,
-      @required this.onSubmitted});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
-      decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(100)),
-      child: TextField(
-        onSubmitted: onSubmitted,
-        controller: controller,
-        decoration: InputDecoration(
-            border: InputBorder.none,
-            hintStyle: Theme.of(context)
-                .textTheme
-                .bodyText1
-                .copyWith(color: Colors.grey),
-            hintText: hintText),
-      ),
+  Column buildEmpty() {
+    return Column(
+      children: [
+        Center(
+            child: SizedBox(
+                height: 200,
+                width: 200,
+                child: Image.asset("images/emptylist.png"))),
+        Text("It's empty in here. Add some tasks!")
+      ],
     );
   }
 }

@@ -3,7 +3,7 @@ A Node.js powered ToDo app built in flutter. Tasks are stored in an sqlite datab
 ## Usage
 * Run 'npm run start' from within the server directory to start the server
 * Make note of the IP address
-* Build and install the flutter project yourself or use one of the prebuilt fat apks in 'ui\todo\build\app\outputs'
+* Build and install the flutter project, either on an emulator or a device
 ## Screenshots
 IP address screen            |  Task screen          | Deleting a task
 :-------------------------:|:-------------------------:|:-------------------------:

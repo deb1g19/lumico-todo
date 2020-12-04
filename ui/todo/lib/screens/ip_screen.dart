@@ -35,8 +35,10 @@ class IPScreen extends StatelessWidget {
                 controller: controller,
                 submitIcon: Icons.arrow_forward,
                 submit: () {
-                  context.read<TasksModel>().setServerURL(controller.text);
-                  Navigator.pushReplacementNamed(context, '/loading_screen');
+                  if (controller.text.length > 0) {
+                    context.read<TasksModel>().setServerURL(controller.text);
+                    Navigator.pushReplacementNamed(context, '/loading_screen');
+                  }
                 },
               ),
             ),

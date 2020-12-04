@@ -31,6 +31,7 @@ dependencies:
   http: ^0.12.2
   provider: ^4.3.2+2
   date_time_format: ^1.1.0
+  flutter_statusbarcolor: ^0.2.3
 
 
 dev_dependencies:
@@ -50,23 +51,5 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - images/empty.png
+    - images/
 
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/assets-and-images/#resolution-aware.
-
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/assets-and-images/#from-packages
-
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  fonts:
-    - family: Source Serif Pro
-      fonts:
-        - asset: fonts/SourceSerifPro-Bold.ttf
-    - family: Inter
-      fonts:
-        - asset: fonts/Inter-Light-slnt=0.ttf

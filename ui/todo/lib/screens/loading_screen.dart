@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo/constants.dart';
 import 'package:todo/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:todo/models/tasks_model.dart';
@@ -29,25 +30,54 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: futureTasks,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return HomeScreen();
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text("Something went wrong"),
-          );
-        } else {
-          return Center(
-            child: SizedBox(
-              width: 50,
-              height: 50,
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-      },
+    return Scaffold(
+      backgroundColor: kOffWhite,
+      body: SafeArea(
+        child: FutureBuilder(
+          future: futureTasks,
+          builder: (context, snapshot) {
+            // Only show the UI if the snapshot has completed, else show the progress indicator
+            // This allows the progress indicator to be shown multiple times when try again is pressed
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasData) {
+                return HomeScreen();
+              } else if (snapshot.hasError) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Make the column full width
+                    Container(
+                      width: double.infinity,
+                    ),
+                    Text(
+                      "Connection timed out",
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                    FlatButton(
+                      child: Text("Try again"),
+                      color: Colors.blueGrey[100],
+                      onPressed: () {
+                        setState(() {
+                          futureTasks =
+                              context.read<TasksModel>().getTasksFromAPI();
+                        });
+                      },
+                    )
+                  ],
+                );
+              }
+            }
+            return Center(
+              child: SizedBox(
+                width: 50,
+                height: 50,
+                child: CircularProgressIndicator(),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

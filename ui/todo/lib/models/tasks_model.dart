@@ -4,18 +4,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:todo/models/task_model.dart';
 import 'package:http/http.dart' as http;
 
-import '../constants.dart';
-
+// Model for the list of tasks, with methods to interact with both the local copy (tasks) and the database simulataneously
 class TasksModel extends ChangeNotifier {
   List<TaskModel> tasks = [];
+  String serverURL = "";
   TasksModel();
+
   void initialise(List<TaskModel> newTasks) {
     tasks.addAll(newTasks);
   }
 
+  void setServerURL(String ip) {
+    serverURL = "http://$ip:8000";
+  }
+
   void addTask(String taskText) async {
     if (taskText.isNotEmpty) {
-      final http.Response response = await http.post('$kAPI_URL/api/task/',
+      final http.Response response = await http.post('$serverURL/api/task/',
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
@@ -41,7 +46,7 @@ class TasksModel extends ChangeNotifier {
 
   void removeTaskAt(int index) async {
     final http.Response response = await http.delete(
-      "$kAPI_URL/api/task/${tasks[index].id}",
+      "$serverURL/api/task/${tasks[index].id}",
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -58,7 +63,7 @@ class TasksModel extends ChangeNotifier {
     tasks.elementAt(index).completed = !tasks.elementAt(index).completed;
     notifyListeners();
     final http.Response response = await http.post(
-      '$kAPI_URL/api/task/${tasks[index].id}/${tasks[index].completed ? 'complete' : 'incomplete'}',
+      '$serverURL/api/task/${tasks[index].id}/${tasks[index].completed ? 'complete' : 'incomplete'}',
     );
     if (response.statusCode != 200) {
       throw Exception('Failed to update task');
@@ -68,15 +73,19 @@ class TasksModel extends ChangeNotifier {
   }
 
   Future<List<TaskModel>> getTasksFromAPI() async {
-    final response = await http.get('$kAPI_URL/api/tasks/');
+    final response = await http
+        .get('$serverURL/api/tasks/')
+        .timeout(Duration(seconds: 5), onTimeout: () {
+      throw ("Connection failed");
+    });
     if (response.statusCode == 200) {
       List<TaskModel> newTasks = List.from(jsonDecode(response.body)["data"])
           .map((e) => TaskModel.fromJson(e))
           .toList();
       tasks.addAll(newTasks);
-      return tasks;
     } else {
-      throw Exception("Failed to get tasks");
+      throw ("Failed to get tasks");
     }
+    return tasks;
   }
 }

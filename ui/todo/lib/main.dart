@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo/loading_screen.dart';
+import 'package:todo/screens/loading_screen.dart';
 import 'models/tasks_model.dart';
 
 void main() {

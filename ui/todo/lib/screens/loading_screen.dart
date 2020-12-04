@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:todo/home_screen.dart';
+import 'package:todo/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:todo/models/tasks_model.dart';
-import 'constants.dart';
-import 'models/task_model.dart';
+import '../constants.dart';
+import '../models/task_model.dart';
 
 class LoadingScreen extends StatefulWidget {
   LoadingScreen({Key key}) : super(key: key);

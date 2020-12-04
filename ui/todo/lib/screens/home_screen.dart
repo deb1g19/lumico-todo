@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:todo/models/task_model.dart';
 import 'package:todo/models/tasks_model.dart';
 import 'package:provider/provider.dart';
 import 'package:todo/widgets/task_item.dart';
+import 'package:date_time_format/date_time_format.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key key}) : super(key: key);
@@ -13,6 +13,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController controller = TextEditingController();
+  final DateTime now = DateTime.now();
   @override
   Widget build(BuildContext context) {
     var tasksModel = context.watch<TasksModel>();
@@ -21,7 +22,8 @@ class _HomeScreenState extends State<HomeScreen> {
         Column(
           children: [
             Text("Todo", style: Theme.of(context).textTheme.headline1),
-            Text("1.12.20", style: Theme.of(context).textTheme.subtitle1),
+            Text("${now.format('j.m.y')}",
+                style: Theme.of(context).textTheme.subtitle1),
             tasksModel.tasks.length == 0
                 ? Column(
                     children: [
@@ -50,11 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class BottomInput extends StatelessWidget {
-  const BottomInput({
-    Key key,
-    @required this.controller,
-    @required this.tasksModel,
-  }) : super(key: key);
+  const BottomInput(
+      {Key key, @required this.controller, @required this.tasksModel})
+      : super(key: key);
 
   final TextEditingController controller;
   final TasksModel tasksModel;
@@ -71,9 +71,12 @@ class BottomInput extends StatelessWidget {
           children: [
             Expanded(
               child: RoundedTextField(
-                hintText: "Test task",
-                controller: controller,
-              ),
+                  hintText: "Test task",
+                  controller: controller,
+                  onSubmitted: (_) {
+                    tasksModel.addTask(controller.text);
+                    controller.clear();
+                  }),
             ),
             SizedBox(
               width: 20,
@@ -82,6 +85,7 @@ class BottomInput extends StatelessWidget {
                 onPressed: () {
                   tasksModel.addTask(controller.text);
                   controller.clear();
+                  FocusScope.of(context).unfocus();
                 },
                 icon: Icons.add)
           ],
@@ -117,7 +121,11 @@ class RoundedIconButton extends StatelessWidget {
 class RoundedTextField extends StatelessWidget {
   final String hintText;
   final TextEditingController controller;
-  const RoundedTextField({@required this.hintText, @required this.controller});
+  final Function onSubmitted;
+  const RoundedTextField(
+      {@required this.hintText,
+      @required this.controller,
+      @required this.onSubmitted});
 
   @override
   Widget build(BuildContext context) {
@@ -126,6 +134,7 @@ class RoundedTextField extends StatelessWidget {
       decoration: BoxDecoration(
           color: Colors.white, borderRadius: BorderRadius.circular(100)),
       child: TextField(
+        onSubmitted: onSubmitted,
         controller: controller,
         decoration: InputDecoration(
             border: InputBorder.none,

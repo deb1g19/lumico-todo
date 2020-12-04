@@ -45,10 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     shrinkWrap: true,
                     itemCount: tasksModel.tasks.length,
                     itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
-                        child: TaskItem(index),
-                      );
+                      return TaskItem(index);
                     },
                   ),
                 ),

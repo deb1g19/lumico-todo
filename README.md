@@ -7,5 +7,5 @@ A Node.js powered ToDo app built in flutter. Tasks are stored in an sqlite datab
 ## Screenshots
 IP address screen            |  Task screen          | Deleting a task
 :-------------------------:|:-------------------------:|:-------------------------:
-![picture alt](https://i.imgur.com/F3mpaPC.jpg "IP address screen") | ![picture alt](https://i.imgur.com/Jeq6sTh.jpg "Task screen") | ![picture alt](https://i.imgur.com/43wPtE2.jpg "Deleting a task")
+![picture alt](https://i.imgur.com/o1tIB9m.jpg "IP address screen") | ![picture alt](https://i.imgur.com/Jeq6sTh.jpg "Task screen") | ![picture alt](https://i.imgur.com/43wPtE2.jpg "Deleting a task")
 

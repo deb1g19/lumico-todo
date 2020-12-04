@@ -23,7 +23,8 @@ class IPScreen extends StatelessWidget {
           Expanded(
             child: Container(
               alignment: Alignment.topCenter,
-              padding: EdgeInsets.only(top: 30),
+              // BottomInput has a default padding of 25
+              padding: EdgeInsets.only(top: 5),
               decoration: BoxDecoration(
                 color: kOffWhite,
                 borderRadius: BorderRadius.only(

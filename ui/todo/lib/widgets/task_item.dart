@@ -24,6 +24,9 @@ class _TaskItemState extends State<TaskItem> {
       onDismissed: (direction) {
         tasksModel.removeTaskAt(widget.index);
       },
+      background: Container(
+        color: Color(0xFFFE5F55),
+      ),
       child: CheckboxListTile(
         activeColor: Theme.of(context).primaryColor,
         value: pressed,

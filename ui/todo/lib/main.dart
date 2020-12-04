@@ -17,7 +17,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   // Changing this colour will recolour all coloured elements within the app to match the theme
-  Color primaryColor = Color(0xFF262626);
+  final Color primaryColor = Color(0xFF262626);
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {

@@ -1,47 +1,55 @@
 import 'package:flutter/material.dart';
-import 'package:todo/models/tasks_model.dart';
 import 'package:todo/widgets/rounded_icon_button.dart';
 import 'package:todo/widgets/rounded_textfield.dart';
 
+// A rounded input field with an IconButton styled for this project
+
 class BottomInput extends StatelessWidget {
   const BottomInput(
-      {Key key, @required this.controller, @required this.tasksModel})
+      {Key key,
+      @required this.controller,
+      @required this.submit,
+      @required this.submitIcon,
+      this.buttonColor,
+      this.buttonTextColor,
+      @required this.hintText})
       : super(key: key);
 
   final TextEditingController controller;
-  final TasksModel tasksModel;
+  // Function called when the user submits text from the TextField
+  final Function submit;
+  final IconData submitIcon;
+  final Color buttonColor;
+  final Color buttonTextColor;
+  final String hintText;
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: MediaQuery.of(context).viewInsets.bottom,
-      child: Padding(
-        padding: const EdgeInsets.all(25.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: RoundedTextField(
-                  hintText: "Test task",
-                  controller: controller,
-                  onSubmitted: (_) {
-                    tasksModel.addTask(controller.text);
-                    controller.clear();
-                  }),
-            ),
-            SizedBox(
-              width: 20,
-            ),
-            RoundedIconButton(
-                onPressed: () {
-                  tasksModel.addTask(controller.text);
+    return Padding(
+      padding: const EdgeInsets.all(25.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: RoundedTextField(
+                hintText: hintText,
+                controller: controller,
+                onSubmitted: (_) {
+                  submit();
                   controller.clear();
-                  FocusScope.of(context).unfocus();
-                },
-                icon: Icons.add)
-          ],
-        ),
+                }),
+          ),
+          SizedBox(
+            width: 20,
+          ),
+          RoundedIconButton(
+              bgColor: buttonColor,
+              textColor: buttonTextColor,
+              onPressed: () {
+                submit();
+                FocusScope.of(context).unfocus();
+              },
+              icon: submitIcon)
+        ],
       ),
     );
   }

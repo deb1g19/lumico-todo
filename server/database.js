@@ -20,7 +20,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 if(err) {
                     // The table has already been created. We don't need to do anything here
                 } else {
-                    var insert = 'INSERT INTO user (task, completed) VALUES (?,?)'
+                    var insert = 'INSERT INTO tasks (task, completed) VALUES (?,?)'
                     db.run(insert, ["Tap anywhere on a task to mark it as completed",0])
                     db.run(insert, ["Swipe a task left or right to delete it",0])
                 }

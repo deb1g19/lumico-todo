@@ -17,7 +17,13 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             completed INTEGER
             )`,
             (err) => {
-                // The table has already been created. We don't need to do anything here but must handle the error
+                if(err) {
+                    // The table has already been created. We don't need to do anything here
+                } else {
+                    var insert = 'INSERT INTO user (task, completed) VALUES (?,?)'
+                    db.run(insert, ["Tap anywhere on a task to mark it as completed",0])
+                    db.run(insert, ["Swipe a task left or right to delete it",0])
+                }
             });
     }
 });

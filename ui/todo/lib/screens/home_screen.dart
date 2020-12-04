@@ -3,9 +3,12 @@ import 'package:todo/constants.dart';
 import 'package:todo/models/tasks_model.dart';
 import 'package:provider/provider.dart';
 import 'package:todo/widgets/bottom_input.dart';
-import 'package:todo/widgets/round_icon.dart';
 import 'package:todo/widgets/task_item.dart';
-import 'package:date_time_format/date_time_format.dart';
+import 'package:todo/widgets/title_bar.dart';
+
+// HomeScreen is the main 'notes page' of the app, where the user can view, delete and create notes
+// The notes are taken from the NotesModel and displayed through a listview builder
+// It would look nicer with an AnimatedList but implementing this with Dismissibles requires a workaround
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key key}) : super(key: key);
@@ -16,23 +19,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController controller = TextEditingController();
-  final DateTime now = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     var tasksModel = context.watch<TasksModel>();
     return Container(
       color: Theme.of(context).primaryColor,
       child: Column(children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const RoundIcon(Icons.event_note_outlined),
-              buildTitleDate(context, now.format('j.m.y'))
-            ],
-          ),
-        ),
+        TitleBar(),
         Expanded(
           child: Container(
             decoration: BoxDecoration(
@@ -42,53 +36,42 @@ class _HomeScreenState extends State<HomeScreen> {
                     topRight: Radius.circular(30))),
             // Padding to compensate for border radius
             padding: EdgeInsets.only(top: 25),
+            // A stack is used to have the textfield for creating new tasks float above the keyboard
             child: Stack(
               children: [
-                tasksModel.tasks.length == 0
-                    ? buildEmpty()
-                    : Container(
-                        child: ListView.builder(
-                          reverse: true,
-                          shrinkWrap: true,
-                          itemCount: tasksModel.tasks.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
-                              child: TaskItem(index),
-                            );
-                          },
-                        ),
-                      ),
-                BottomInput(controller: controller, tasksModel: tasksModel)
+                Container(
+                  child: ListView.builder(
+                    reverse: true,
+                    shrinkWrap: true,
+                    itemCount: tasksModel.tasks.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
+                        child: TaskItem(index),
+                      );
+                    },
+                  ),
+                ),
+                // The input controls for creating a new task
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                  child: BottomInput(
+                    hintText: "Write a new task",
+                    controller: controller,
+                    submit: () {
+                      tasksModel.addTask(controller.text);
+                      controller.clear();
+                    },
+                    submitIcon: Icons.add,
+                  ),
+                )
               ],
             ),
           ),
         )
       ]),
-    );
-  }
-
-  Column buildTitleDate(BuildContext context, String date) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text("Todo", style: Theme.of(context).textTheme.headline1),
-        Text(date, style: Theme.of(context).textTheme.subtitle1),
-      ],
-    );
-  }
-
-  Column buildEmpty() {
-    return Column(
-      children: [
-        Center(
-            child: SizedBox(
-                height: 200,
-                width: 200,
-                child: Image.asset("images/emptylist.png"))),
-        Text("It's empty in here. Add some tasks!")
-      ],
     );
   }
 }

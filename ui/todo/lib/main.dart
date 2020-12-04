@@ -16,16 +16,18 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  // Changing this colour will recolour all coloured elements within the app to match the theme
+  Color primaryColor = Colors.green;
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     //Status bar color is usually determined by scaffold, but scaffold color is not the same as the bg at the top of the screen, so this looks more natural
-    FlutterStatusbarcolor.setStatusBarColor(Colors.blue);
+    FlutterStatusbarcolor.setStatusBarColor(primaryColor);
     return MaterialApp(
       title: 'Todo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primaryColor: primaryColor,
           visualDensity: VisualDensity.adaptivePlatformDensity,
           textTheme: TextTheme(
               bodyText1: TextStyle(

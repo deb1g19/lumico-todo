@@ -25,6 +25,7 @@ class _TaskItemState extends State<TaskItem> {
         tasksModel.removeTaskAt(widget.index);
       },
       child: CheckboxListTile(
+        activeColor: Theme.of(context).primaryColor,
         value: pressed,
         onChanged: (value) {
           tasksModel.toggleTaskAt(widget.index);

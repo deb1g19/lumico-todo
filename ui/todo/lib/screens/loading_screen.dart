@@ -52,16 +52,28 @@ class _LoadingScreenState extends State<LoadingScreen> {
                     ),
                     Text(
                       "Connection timed out",
-                      style: Theme.of(context).textTheme.bodyText1,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1
+                          .copyWith(fontWeight: FontWeight.bold),
                     ),
                     FlatButton(
                       child: Text("Try again"),
-                      color: Colors.blueGrey[100],
+                      color: Colors.black,
+                      textColor: Colors.white,
                       onPressed: () {
                         setState(() {
                           futureTasks =
                               context.read<TasksModel>().getTasksFromAPI();
                         });
+                      },
+                    ),
+                    FlatButton(
+                      child: Text("Go back"),
+                      color: Theme.of(context).primaryColor,
+                      textColor: Colors.white,
+                      onPressed: () {
+                        Navigator.popAndPushNamed(context, "/");
                       },
                     )
                   ],

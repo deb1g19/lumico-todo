@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:todo/models/tasks_model.dart';
 import 'package:provider/provider.dart';
 
+// An individual list item, displayed using the listview builder on the home_screen
+// TaskItem takes the index of the task data it represents in the TasksModel, so that
+// it can access data about itself while separating view and model
+
 class TaskItem extends StatefulWidget {
   final int index;
   TaskItem(this.index);

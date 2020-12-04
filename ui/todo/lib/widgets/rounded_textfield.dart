@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+// A TextField with rounded corners and no border or label
+
 class RoundedTextField extends StatelessWidget {
   final String hintText;
   final TextEditingController controller;

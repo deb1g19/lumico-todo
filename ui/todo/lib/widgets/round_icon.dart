@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 
 // A padded circle with a centered Icon as the child, given as a parameter to the class constructor
+
 class RoundIcon extends StatelessWidget {
   final IconData icon;
   const RoundIcon(this.icon);
